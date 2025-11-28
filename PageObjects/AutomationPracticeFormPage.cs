@@ -36,6 +36,53 @@ namespace CloudQAAutomation.PageObjects
 
         #endregion
 
+        #region IFrame Helpers
+
+        /// <summary>
+        /// Switches driver's context into an iframe by its `id` attribute.
+        /// Falls back to locating the iframe element by XPath if direct id lookup fails.
+        /// </summary>
+        public void SwitchToIframeById(string id)
+        {
+            Console.WriteLine($"[IFRAME] Switching to iframe by id: {id}");
+            var iframe = _elementFinder.FindElement(
+                LocatorStrategy.ById(id),
+                LocatorStrategy.ByXPath($"//iframe[@id='{id}']")
+            );
+
+            _driver.SwitchTo().Frame(iframe);
+            WaitForPageLoad();
+        }
+
+        /// <summary>
+        /// Switches into the first iframe that follows a heading with the provided text.
+        /// Useful for iframes without stable attributes — we locate them by nearby visible content.
+        /// </summary>
+        public void SwitchToIframeContainingHeading(string headingText)
+        {
+            Console.WriteLine($"[IFRAME] Switching to iframe following heading: {headingText}");
+            var iframe = _elementFinder.FindElement(
+                LocatorStrategy.ByXPath($"//h1[contains(normalize-space(text()), '{headingText}')]/following::iframe[1]"),
+                LocatorStrategy.ByXPath($"//h2[contains(normalize-space(text()), '{headingText}')]/following::iframe[1]"),
+                LocatorStrategy.ByXPath($"//label[contains(normalize-space(text()), '{headingText}')]/following::iframe[1]")
+            );
+
+            _driver.SwitchTo().Frame(iframe);
+            WaitForPageLoad();
+        }
+
+        /// <summary>
+        /// Returns driver to the top-level browsing context.
+        /// </summary>
+        public void SwitchToDefaultContent()
+        {
+            Console.WriteLine("[IFRAME] Switching back to default content");
+            _driver.SwitchTo().DefaultContent();
+            WaitForPageLoad();
+        }
+
+        #endregion
+
         #region Dynamic HTML Analysis
 
         // HtmlAnalyzer removed for production; dynamic analysis methods intentionally omitted.

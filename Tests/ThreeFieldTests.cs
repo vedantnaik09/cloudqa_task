@@ -46,6 +46,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(1)]
         [Category("FirstName")]
+        [Category("Level_Main")]
         [TestCase("John")]
         [TestCase("Alice")]
         [TestCase("Test User")]
@@ -67,6 +68,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(2)]
         [Category("FirstName")]
+        [Category("Level_Main")]
         public void Test_02_FirstName_ClearFieldWorks()
         {
             // Arrange
@@ -84,6 +86,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(3)]
         [Category("FirstName")]
+        [Category("Level_Main")]
         public void Test_03_FirstName_HandlesSpecialCharacters()
         {
             // Arrange
@@ -103,10 +106,13 @@ namespace CloudQAAutomation.Tests
 
         #endregion
 
+        
+
         #region Email Field Tests
 
         [Test, Order(4)]
         [Category("Email")]
+        [Category("Level_Main")]
         [TestCase("test@example.com")]
         [TestCase("user.name+tag@domain.co.uk")]
         [TestCase("valid_email123@test-domain.org")]
@@ -128,6 +134,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(5)]
         [Category("Email")]
+        [Category("Level_Main")]
         public void Test_05_Email_ClearFieldWorks()
         {
             // Arrange
@@ -145,6 +152,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(6)]
         [Category("Email")]
+        [Category("Level_Main")]
         public void Test_06_Email_PreservesValueOnNavigationWithinPage()
         {
             // Arrange
@@ -177,6 +185,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(7)]
         [Category("State")]
+        [Category("Level_Main")]
         [TestCase("India")]
         [TestCase("United States")]
         [TestCase("Canada")]
@@ -199,6 +208,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(8)]
         [Category("State")]
+        [Category("Level_Main")]
         public void Test_08_State_SelectsByIndexSuccessfully()
         {
             // Arrange
@@ -219,6 +229,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(9)]
         [Category("State")]
+        [Category("Level_Main")]
         public void Test_09_State_HasExpectedOptions()
         {
             // Arrange & Act
@@ -244,6 +255,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(10)]
         [Category("State")]
+        [Category("Level_Main")]
         public void Test_10_State_CanChangeSelectionMultipleTimes()
         {
             // Arrange
@@ -271,6 +283,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(11)]
         [Category("Integration")]
+        [Category("Level_Main")]
         public void Test_11_Integration_FillAllThreeFieldsTogether()
         {
             // Arrange
@@ -308,6 +321,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(12)]
         [Category("Integration")]
+        [Category("Level_Main")]
         public void Test_12_Integration_ResetFormClearsAllFields()
         {
             // Arrange
@@ -337,6 +351,7 @@ namespace CloudQAAutomation.Tests
 
         [Test, Order(13)]
         [Category("Resilience")]
+        [Category("Level_Main")]
         public void Test_13_Resilience_LocatorsWorkAfterPageRefresh()
         {
             // Arrange
@@ -361,6 +376,96 @@ namespace CloudQAAutomation.Tests
                 "Locators should still work after page refresh");
 
             Console.WriteLine("✓ Locators remained stable after page refresh");
+        }
+
+        #endregion
+
+        #region IFrame Tests
+
+        // Level: IFrame without ID - order 14..16
+        [Test, Order(14)]
+        [Category("FirstName")]
+        [Category("Level_IFrame_NoId")]
+        public void Test_14_IFrameNoId_FirstName()
+        {
+            Console.WriteLine("\nTest: IFrame without ID - interact with First Name field");
+            _page!.SwitchToIframeContainingHeading("IFrame without ID");
+            _page.EnterFirstName("IframeNoIdUser");
+            var valueInFrame = _page.GetFirstNameValue();
+            _page.SwitchToDefaultContent();
+            Assert.That(valueInFrame, Is.EqualTo("IframeNoIdUser"));
+            Console.WriteLine($"✓ Entered in iframe without id: {valueInFrame}");
+        }
+
+        [Test, Order(15)]
+        [Category("Email")]
+        [Category("Level_IFrame_NoId")]
+        public void Test_15_IFrameNoId_Email()
+        {
+            Console.WriteLine("\nTest: IFrame without ID - interact with Email field");
+            _page!.SwitchToIframeContainingHeading("IFrame without ID");
+            _page.EnterEmail("iframe.noid@example.com");
+            var emailValue = _page.GetEmailValue();
+            _page.SwitchToDefaultContent();
+            Assert.That(emailValue, Is.EqualTo("iframe.noid@example.com"));
+            Console.WriteLine($"✓ Email entered in iframe without id: {emailValue}");
+        }
+
+        [Test, Order(16)]
+        [Category("State")]
+        [Category("Level_IFrame_NoId")]
+        public void Test_16_IFrameNoId_State()
+        {
+            Console.WriteLine("\nTest: IFrame without ID - interact with State dropdown");
+            _page!.SwitchToIframeContainingHeading("IFrame without ID");
+            _page.SelectState("United States");
+            var selected = _page.GetSelectedState();
+            _page.SwitchToDefaultContent();
+            Assert.That(selected, Is.EqualTo("United States"));
+            Console.WriteLine($"✓ State selected in iframe without id: {selected}");
+        }
+
+        // Level: IFrame with ID - order 17..19
+        [Test, Order(17)]
+        [Category("FirstName")]
+        [Category("Level_IFrame_WithId")]
+        public void Test_17_IFrameWithId_FirstName()
+        {
+            Console.WriteLine("\nTest: IFrame with ID - interact with First Name field");
+            _page!.SwitchToIframeById("iframeId");
+            _page.EnterFirstName("IframeWithIdUser");
+            var valueInFrame = _page.GetFirstNameValue();
+            _page.SwitchToDefaultContent();
+            Assert.That(valueInFrame, Is.EqualTo("IframeWithIdUser"));
+            Console.WriteLine($"✓ Entered in iframe with id: {valueInFrame}");
+        }
+
+        [Test, Order(18)]
+        [Category("Email")]
+        [Category("Level_IFrame_WithId")]
+        public void Test_18_IFrameWithId_Email()
+        {
+            Console.WriteLine("\nTest: IFrame with ID - interact with Email field");
+            _page!.SwitchToIframeById("iframeId");
+            _page.EnterEmail("iframe.withid@example.com");
+            var emailValue = _page.GetEmailValue();
+            _page.SwitchToDefaultContent();
+            Assert.That(emailValue, Is.EqualTo("iframe.withid@example.com"));
+            Console.WriteLine($"✓ Email entered in iframe with id: {emailValue}");
+        }
+
+        [Test, Order(19)]
+        [Category("State")]
+        [Category("Level_IFrame_WithId")]
+        public void Test_19_IFrameWithId_State()
+        {
+            Console.WriteLine("\nTest: IFrame with ID - interact with State dropdown");
+            _page!.SwitchToIframeById("iframeId");
+            _page.SelectState("India");
+            var selected = _page.GetSelectedState();
+            _page.SwitchToDefaultContent();
+            Assert.That(selected, Is.EqualTo("India"));
+            Console.WriteLine($"✓ State selected in iframe with id: {selected}");
         }
 
         #endregion
