@@ -36,6 +36,112 @@ namespace CloudQAAutomation.PageObjects
 
         #endregion
 
+        #region Shadow DOM Helpers
+
+        /// <summary>
+        /// Finds the <shadow-form> host that follows a heading with the specified text.
+        /// </summary>
+        public IWebElement FindShadowHostByHeading(string headingText)
+        {
+            var xpath = $"//h1[normalize-space(text())='{headingText}']/following::shadow-form[1]";
+            Console.WriteLine($"[SHADOW] Locating shadow host by heading: {headingText}");
+            return _driver.FindElement(By.XPath(xpath));
+        }
+
+        /// <summary>
+        /// Finds an element inside the shadow root of the shadow-form host located after the given heading.
+        /// Tries Selenium 4 shadow root API first, falls back to JS querySelector if needed.
+        /// </summary>
+        public IWebElement FindElementInShadowByHeading(string headingText, string cssSelector)
+        {
+            var host = FindShadowHostByHeading(headingText);
+
+            // First try the host's light DOM children (slotted content is often placed here)
+            try
+            {
+                var hostChild = host.FindElements(By.CssSelector(cssSelector)).FirstOrDefault();
+                if (hostChild != null)
+                {
+                    Console.WriteLine($"[SHADOW] Found element as host child (light DOM): {cssSelector}");
+                    return hostChild;
+                }
+            }
+            catch { /* ignore */ }
+
+            // Next try Selenium shadow root API
+            try
+            {
+                var shadowRoot = host.GetShadowRoot();
+                var el = shadowRoot.FindElements(By.CssSelector(cssSelector)).FirstOrDefault();
+                if (el != null)
+                {
+                    Console.WriteLine($"[SHADOW] Found element in shadow root using Selenium API: {cssSelector}");
+                    return el;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SHADOW] Selenium shadow API lookup failed: {ex.Message}. Trying JS fallback for selector: {cssSelector}");
+            }
+
+            // Finally try JS fallback that queries shadowRoot or host
+            try
+            {
+                var js = (IJavaScriptExecutor)_driver;
+                var result = js.ExecuteScript("return (arguments[0].shadowRoot || arguments[0]).querySelector(arguments[1])", host, cssSelector);
+                if (result == null) throw new NoSuchElementException($"Element not found in shadow host: {cssSelector}");
+                Console.WriteLine($"[SHADOW] Found element in shadow root using JS fallback: {cssSelector}");
+                return (IWebElement)result;
+            }
+            catch (Exception ex)
+            {
+                throw new NoSuchElementException($"Element not found in shadow host (all strategies): {cssSelector}. Details: {ex.Message}");
+            }
+        }
+
+        public void EnterShadowFirstName(string headingText, string value)
+        {
+            // Prefer the fname slot first to avoid matching the generic placeholder
+            var el = FindElementInShadowByHeading(headingText, "section[slot='fname'] input, input#fname, input[name='fname']");
+            _elementFinder.SafeSendKeys(el, value);
+        }
+
+        public string GetShadowFirstNameValue(string headingText)
+        {
+            var el = FindElementInShadowByHeading(headingText, "section[slot='fname'] input, input#fname, input[name='fname']");
+            return el.GetAttribute("value") ?? string.Empty;
+        }
+
+        public void EnterShadowLastName(string headingText, string value)
+        {
+            // Prefer the lname slot first to avoid accidentally matching the first name input
+            var el = FindElementInShadowByHeading(headingText, "section[slot='lname'] input, input#lname, input[name='lname']");
+            _elementFinder.SafeSendKeys(el, value);
+        }
+
+        public string GetShadowLastNameValue(string headingText)
+        {
+            var el = FindElementInShadowByHeading(headingText, "section[slot='lname'] input, input#lname, input[name='lname']");
+            return el.GetAttribute("value") ?? string.Empty;
+        }
+
+        public void SelectShadowState(string headingText, string visibleText)
+        {
+            var el = FindElementInShadowByHeading(headingText, "select#state, select[name='State']");
+            var select = new SelectElement(el);
+            try { select.SelectByText(visibleText); }
+            catch { select.SelectByValue(visibleText); }
+        }
+
+        public string GetSelectedShadowState(string headingText)
+        {
+            var el = FindElementInShadowByHeading(headingText, "select#state, select[name='State']");
+            var select = new SelectElement(el);
+            return select.SelectedOption.Text;
+        }
+
+        #endregion
+
         #region IFrame Helpers
 
         /// <summary>

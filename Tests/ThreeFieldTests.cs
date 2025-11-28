@@ -1,6 +1,8 @@
 using NUnit.Framework;
 using CloudQAAutomation.PageObjects;
 using CloudQAAutomation.Helpers;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace CloudQAAutomation.Tests
 {
@@ -476,6 +478,43 @@ namespace CloudQAAutomation.Tests
             _page.SwitchToDefaultContent();
             Assert.That(selected, Is.EqualTo("India"));
             Console.WriteLine($"✓ State selected in iframe with id: {selected}");
+        }
+
+        #endregion
+
+        #region Shadow DOM Tests
+
+        [Test, Order(20)]
+        [Category("Level_ShadowDom")]
+        public void Test_20_ShadowDom_FirstName()
+        {
+            Console.WriteLine("\nTest: Shadow DOM - First Name field");
+            _page!.EnterShadowFirstName("Shadow DOM", "ShadowFirst");
+            var actual = _page.GetShadowFirstNameValue("Shadow DOM");
+            Assert.That(actual, Is.EqualTo("ShadowFirst"));
+            Console.WriteLine($"✓ Shadow DOM first name entered and verified: {actual}");
+        }
+
+        [Test, Order(21)]
+        [Category("Level_ShadowDom")]
+        public void Test_21_ShadowDom_LastName()
+        {
+            Console.WriteLine("\nTest: Shadow DOM - Last Name field");
+            _page!.EnterShadowLastName("Shadow DOM", "ShadowLast");
+            var actual = _page.GetShadowLastNameValue("Shadow DOM");
+            Assert.That(actual, Is.EqualTo("ShadowLast"));
+            Console.WriteLine($"✓ Shadow DOM last name entered and verified: {actual}");
+        }
+
+        [Test, Order(22)]
+        [Category("Level_ShadowDom")]
+        public void Test_22_ShadowDom_State()
+        {
+            Console.WriteLine("\nTest: Shadow DOM - State dropdown");
+            _page!.SelectShadowState("Shadow DOM", "India");
+            var selected = _page.GetSelectedShadowState("Shadow DOM");
+            Assert.That(selected, Is.EqualTo("India"));
+            Console.WriteLine($"✓ Shadow DOM state selected and verified: {selected}");
         }
 
         #endregion
