@@ -45,6 +45,7 @@ bld/
 
 ## ChromeDriver logs
 chromedriver.log
+logs/
 
 ## HTML snapshots (optional - uncomment to ignore)
 # logs/html-snippets/**/*.html

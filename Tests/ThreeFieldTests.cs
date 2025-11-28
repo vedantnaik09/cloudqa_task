@@ -36,6 +36,16 @@ namespace CloudQAAutomation.Tests
         public void Teardown()
         {
             Console.WriteLine("\n=== Test Teardown ===");
+            try
+            {
+                var testName = TestContext.CurrentContext.Test.Name;
+                var outcome = TestContext.CurrentContext.Result.Outcome.Status.ToString();
+                SaveScreenshot($"{testName}_{outcome}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error taking screenshot in teardown: {ex.Message}");
+            }
             CleanupDriver();
             Console.WriteLine("=== Teardown Complete ===");
         }
