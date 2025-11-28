@@ -1,0 +1,54 @@
+## bin and obj folders
+**/bin/
+**/obj/
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vscode/
+## Test results
+TestResults/
+*.trx
+*.coverage
+
+## Visual Studio cache/options
+.vs/
+
+## ReSharper cache
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+
+## Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+## ChromeDriver logs
+chromedriver.log
+
+## HTML snapshots (optional - uncomment to ignore)
+# logs/html-snippets/**/*.html
+
+## OS files
+.DS_Store
+Thumbs.db
