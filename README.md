@@ -10,6 +10,9 @@ Who this README is for
 
 Why this repo exists (one line)
 - To provide resilient automation that validates form behavior across common web contexts and surface validation bugs quickly.
+<img width="1013" height="836" alt="Screenshot 2025-11-29 161019" src="https://github.com/user-attachments/assets/159abeb8-92d0-45e7-aa29-f44af95e7573" />
+
+  
 
 Quick Start — top commands
 --------------------------
@@ -55,7 +58,7 @@ Validation tests included in `FormSubmissionTests` (what we check during submiss
 Category notes:
 - The new submission tests use categories `Submit_IFrameNoId`, `Submit_IFrameWithId`, and `Submit_ShadowDOM` so they can be targeted by the run filters or helper scripts.
 
-- Three level testing for all levels (Main, IFrame, Shadow DOM):
+- Three fields(Name,Email,State) testing for all levels (Main, IFrame, Shadow DOM):
 
 ```powershell
 # Run Level_Main, Level_IFrame_NoId, Level_IFrame_WithId, Level_ShadowDom and get a summarized report
