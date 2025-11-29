@@ -485,6 +485,7 @@ namespace CloudQAAutomation.Tests
         #region Shadow DOM Tests
 
         [Test, Order(20)]
+        [Category("FirstName")]
         [Category("Level_ShadowDom")]
         public void Test_20_ShadowDom_FirstName()
         {
@@ -496,6 +497,7 @@ namespace CloudQAAutomation.Tests
         }
 
         [Test, Order(21)]
+        [Category("LastName")]
         [Category("Level_ShadowDom")]
         public void Test_21_ShadowDom_LastName()
         {
@@ -507,6 +509,7 @@ namespace CloudQAAutomation.Tests
         }
 
         [Test, Order(22)]
+        [Category("State")]
         [Category("Level_ShadowDom")]
         public void Test_22_ShadowDom_State()
         {
@@ -516,6 +519,20 @@ namespace CloudQAAutomation.Tests
             Assert.That(selected, Is.EqualTo("India"));
             Console.WriteLine($"✓ Shadow DOM state selected and verified: {selected}");
         }
+
+        #endregion
+
+        #region Note: Form Submission Tests Moved
+
+        // NOTE: All form submission tests have been moved to FormSubmissionTests.cs
+        // This includes tests for:
+        // - Main Document submissions (Test_100 - Test_112)
+        // - IFrame without ID submissions
+        // - IFrame with ID submissions  
+        // - Shadow DOM submissions
+        //
+        // Run all submission tests with: dotnet test --filter "Category=FormSubmission"
+        // Run specific level with: dotnet test --filter "Category=Submit_Main"
 
         #endregion
     }

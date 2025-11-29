@@ -195,6 +195,476 @@ namespace CloudQAAutomation.PageObjects
 
         #endregion
 
+        #region Last Name Field
+
+        private IWebElement FindLastNameField()
+        {
+            return _elementFinder.FindElement(
+                LocatorStrategy.ByLabel("Last Name"),
+                LocatorStrategy.ByName("Last Name"),
+                LocatorStrategy.ByPlaceholder("Last Name"),
+                LocatorStrategy.ById("lname"),
+                LocatorStrategy.ByXPath("//input[@type='text' and @class='form-control'][2]")
+            );
+        }
+
+        public void EnterLastName(string lastName)
+        {
+            Console.WriteLine($"[LAST_NAME] Entering: {lastName}");
+            var element = FindLastNameField();
+            _elementFinder.SafeSendKeys(element, lastName);
+        }
+
+        public string GetLastNameValue()
+        {
+            var element = FindLastNameField();
+            return element.GetAttribute("value") ?? string.Empty;
+        }
+
+        #endregion
+
+        #region Gender Field
+
+        public void SelectGender(string gender)
+        {
+            Console.WriteLine($"[GENDER] Selecting: {gender}");
+            var xpath = $"//input[@type='radio' and @value='{gender}']";
+            var element = _elementFinder.FindElement(
+                LocatorStrategy.ByXPath(xpath),
+                LocatorStrategy.ByXPath($"//label[contains(text(), '{gender}')]/preceding-sibling::input[@type='radio']")
+            );
+            _elementFinder.SafeClick(element);
+        }
+
+        public string GetSelectedGender()
+        {
+            var element = _driver.FindElement(By.XPath("//input[@type='radio' and @checked]"));
+            return element.GetAttribute("value") ?? string.Empty;
+        }
+
+        #endregion
+
+        #region Date of Birth Field
+
+        private IWebElement FindDateOfBirthField()
+        {
+            return _elementFinder.FindElement(
+                LocatorStrategy.ByLabel("Date of Birth"),
+                LocatorStrategy.ByName("DateOfBirth"),
+                LocatorStrategy.ById("dob"),
+                LocatorStrategy.ByXPath("//input[@type='date']")
+            );
+        }
+
+        public void EnterDateOfBirth(string date)
+        {
+            Console.WriteLine($"[DOB] Entering: {date}");
+            var element = FindDateOfBirthField();
+            _elementFinder.SafeSendKeys(element, date);
+        }
+
+        public string GetDateOfBirthValue()
+        {
+            var element = FindDateOfBirthField();
+            return element.GetAttribute("value") ?? string.Empty;
+        }
+
+        #endregion
+
+        #region Mobile Number Field
+
+        private IWebElement FindMobileField()
+        {
+            return _elementFinder.FindElement(
+                LocatorStrategy.ByLabel("Mobile #"),
+                LocatorStrategy.ByName("Mobile Number"),
+                LocatorStrategy.ByPlaceholder("Mobile Number"),
+                LocatorStrategy.ById("mobile"),
+                LocatorStrategy.ByXPath("//input[@type='text' and contains(@placeholder, 'Mobile')]")
+            );
+        }
+
+        public void EnterMobileNumber(string mobile)
+        {
+            Console.WriteLine($"[MOBILE] Entering: {mobile}");
+            var element = FindMobileField();
+            _elementFinder.SafeSendKeys(element, mobile);
+        }
+
+        public string GetMobileNumberValue()
+        {
+            var element = FindMobileField();
+            return element.GetAttribute("value") ?? string.Empty;
+        }
+
+        #endregion
+
+        #region Country Field
+
+        private IWebElement FindCountryField()
+        {
+            return _elementFinder.FindElement(
+                LocatorStrategy.ByLabel("Country"),
+                LocatorStrategy.ByName("Country"),
+                LocatorStrategy.ById("country"),
+                LocatorStrategy.ByXPath("//input[@type='text' and contains(@placeholder, 'Country')]")
+            );
+        }
+
+        public void EnterCountry(string country)
+        {
+            Console.WriteLine($"[COUNTRY] Entering: {country}");
+            var element = FindCountryField();
+            _elementFinder.SafeSendKeys(element, country);
+        }
+
+        public string GetCountryValue()
+        {
+            var element = FindCountryField();
+            return element.GetAttribute("value") ?? string.Empty;
+        }
+
+        #endregion
+
+        #region Hobbies Field
+
+        public void SelectHobby(string hobby)
+        {
+            Console.WriteLine($"[HOBBY] Selecting: {hobby}");
+            var element = _elementFinder.FindElement(
+                LocatorStrategy.ByXPath($"//input[@type='checkbox' and @name='{hobby}']"),
+                LocatorStrategy.ByXPath($"//input[@type='checkbox' and @value='{hobby}']"),
+                LocatorStrategy.ByXPath($"//label[contains(text(), '{hobby}')]/preceding-sibling::input[@type='checkbox']")
+            );
+            if (!element.Selected)
+            {
+                _elementFinder.SafeClick(element);
+            }
+        }
+
+        public bool IsHobbySelected(string hobby)
+        {
+            var element = _driver.FindElement(By.XPath($"//input[@type='checkbox' and @value='{hobby}']"));
+            return element.Selected;
+        }
+
+        #endregion
+
+        #region About Yourself Field
+
+        private IWebElement FindAboutField()
+        {
+            return _elementFinder.FindElement(
+                LocatorStrategy.ByLabel("About Yourself"),
+                LocatorStrategy.ByName("About"),
+                LocatorStrategy.ById("about"),
+                LocatorStrategy.ByXPath("//textarea[@class='form-control']")
+            );
+        }
+
+        public void EnterAbout(string about)
+        {
+            Console.WriteLine($"[ABOUT] Entering: {about}");
+            var element = FindAboutField();
+            _elementFinder.SafeSendKeys(element, about);
+        }
+
+        public string GetAboutValue()
+        {
+            var element = FindAboutField();
+            return element.GetAttribute("value") ?? string.Empty;
+        }
+
+        #endregion
+
+        #region Username Field
+
+        private IWebElement FindUsernameField()
+        {
+            return _elementFinder.FindElement(
+                LocatorStrategy.ByName("Username"),
+                LocatorStrategy.ById("username"),
+                LocatorStrategy.ByXPath("//input[@type='text' and contains(@placeholder, 'Username')]"),
+                LocatorStrategy.ByXPath("//label[contains(text(), 'Username')]/following::input[1]")
+            );
+        }
+
+        public void EnterUsername(string username)
+        {
+            Console.WriteLine($"[USERNAME] Entering: {username}");
+            var element = FindUsernameField();
+            _elementFinder.SafeSendKeys(element, username);
+        }
+
+        public string GetUsernameValue()
+        {
+            var element = FindUsernameField();
+            return element.GetAttribute("value") ?? string.Empty;
+        }
+
+        #endregion
+
+        #region Password Fields
+
+        private IWebElement FindPasswordField()
+        {
+            return _elementFinder.FindElement(
+                LocatorStrategy.ByName("Password"),
+                LocatorStrategy.ById("password"),
+                LocatorStrategy.ByXPath("//input[@type='password'][1]"),
+                LocatorStrategy.ByXPath("//label[contains(text(), 'Password')]/following::input[@type='password'][1]")
+            );
+        }
+
+        public void EnterPassword(string password)
+        {
+            Console.WriteLine($"[PASSWORD] Entering: {password}");
+            var element = FindPasswordField();
+            _elementFinder.SafeSendKeys(element, password);
+        }
+
+        private IWebElement FindConfirmPasswordField()
+        {
+            return _elementFinder.FindElement(
+                LocatorStrategy.ByName("Confirm Password"),
+                LocatorStrategy.ById("confirmpassword"),
+                LocatorStrategy.ByXPath("//input[@type='password'][2]"),
+                LocatorStrategy.ByXPath("//label[contains(text(), 'Confirm Password')]/following::input[@type='password'][1]")
+            );
+        }
+
+        public void EnterConfirmPassword(string confirmPassword)
+        {
+            Console.WriteLine($"[CONFIRM_PASSWORD] Entering: {confirmPassword}");
+            var element = FindConfirmPasswordField();
+            _elementFinder.SafeSendKeys(element, confirmPassword);
+        }
+
+        #endregion
+
+        #region Terms and Conditions
+
+        private IWebElement FindTermsCheckbox()
+        {
+            return _elementFinder.FindElement(
+                LocatorStrategy.ById("Agree"),
+                LocatorStrategy.ByName("Agree"),
+                LocatorStrategy.ByXPath("//input[@type='checkbox' and @id='Agree']"),
+                LocatorStrategy.ByXPath("//input[@type='checkbox' and contains(@value, 'Agree')]"),
+                LocatorStrategy.ByXPath("//a[contains(text(), 'terms')]/preceding-sibling::input[@type='checkbox']")
+            );
+        }
+
+        public void CheckTermsAndConditions()
+        {
+            Console.WriteLine("[TERMS] Checking terms and conditions");
+            var element = FindTermsCheckbox();
+            if (!element.Selected)
+            {
+                _elementFinder.SafeClick(element);
+            }
+        }
+
+        public void UncheckTermsAndConditions()
+        {
+            Console.WriteLine("[TERMS] Unchecking terms and conditions");
+            var element = FindTermsCheckbox();
+            if (element.Selected)
+            {
+                _elementFinder.SafeClick(element);
+            }
+        }
+
+        public bool IsTermsChecked()
+        {
+            var element = FindTermsCheckbox();
+            return element.Selected;
+        }
+
+        #endregion
+
+        #region Submit Response Validation
+
+        /// <summary>
+        /// Gets the submit response data displayed on the page after form submission
+        /// Returns a dictionary with field names and their submitted values
+        /// </summary>
+        public Dictionary<string, string> GetSubmitResponseData()
+        {
+            Console.WriteLine("[RESPONSE] Parsing submit response data");
+            var data = new Dictionary<string, string>();
+
+            try
+            {
+                // Wait for the submit response to appear
+                Thread.Sleep(2000); // Give page time to update
+                
+                var pageSource = _driver.PageSource;
+                Console.WriteLine($"[RESPONSE] Page contains 'Submit data': {pageSource.Contains("Submit data")}");
+
+                // Try multiple strategies to find the response
+                IWebElement? responseElement = null;
+                
+                try
+                {
+                    responseElement = _driver.FindElement(By.XPath("//h2[contains(text(), 'Submit data')]/following::*[1]"));
+                }
+                catch
+                {
+                    try
+                    {
+                        // Look for any element containing the JSON structure
+                        responseElement = _driver.FindElement(By.XPath("//*[contains(text(), '\"First Name\"')]"));
+                    }
+                    catch
+                    {
+                        // Last resort: check page source for JSON
+                        if (pageSource.Contains("{\"First Name\":"))
+                        {
+                            var startIdx = pageSource.IndexOf("{\"First Name\":");
+                            if (startIdx >= 0)
+                            {
+                                var endIdx = pageSource.IndexOf("}", startIdx);
+                                if (endIdx > startIdx)
+                                {
+                                    var jsonText = pageSource.Substring(startIdx, endIdx - startIdx + 1);
+                                    ParseJsonResponse(jsonText, data);
+                                    return data;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (responseElement != null)
+                {
+                    var responseText = responseElement.Text;
+                    Console.WriteLine($"[RESPONSE] Raw response: {responseText}");
+                    ParseJsonResponse(responseText, data);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[RESPONSE] Error parsing response: {ex.Message}");
+            }
+
+            return data;
+        }
+
+        private void ParseJsonResponse(string responseText, Dictionary<string, string> data)
+        {
+            // Parse the JSON-like response
+            // The response format is like: { "First Name": "Test", "Last Name": "Test2", ... }
+            var lines = responseText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                if (line.Contains(":"))
+                {
+                    var parts = line.Split(new[] { ':' }, 2);
+                    if (parts.Length == 2)
+                    {
+                        var key = parts[0].Trim().Trim('"', '{', ',', ' ');
+                        var value = parts[1].Trim().Trim('"', ',', '}', ' ');
+                        if (!string.IsNullOrWhiteSpace(key) && !key.StartsWith("__"))
+                        {
+                            data[key] = value;
+                            Console.WriteLine($"[RESPONSE] Parsed: {key} = {value}");
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the submit response page is displayed
+        /// This verifies that the form was actually submitted by checking for the response JSON data
+        /// </summary>
+        public bool IsSubmitResponseDisplayed()
+        {
+            try
+            {
+                // Give the form time to submit and page to update
+                Thread.Sleep(1500);
+                
+                var pageSource = _driver.PageSource;
+                
+                // Check if the page contains the JSON response structure with actual data
+                // The response should have the format: { "First Name": "value", ...
+                // Look for the specific structure that appears after submission
+                bool hasSubmitHeading = pageSource.Contains("<h2>Submit data</h2>") || 
+                                       pageSource.Contains(">Submit data<");
+                
+                bool hasJsonResponse = pageSource.Contains("\"First Name\":") && 
+                                      pageSource.Contains("\"Last Name\":") &&
+                                      pageSource.Contains("\"__RequestVerificationToken\":");
+                
+                // The form must have BOTH the heading AND the JSON response
+                if (hasSubmitHeading && hasJsonResponse)
+                {
+                    Console.WriteLine("[RESPONSE] Submit response detected with JSON data");
+                    return true;
+                }
+                
+                // Additional check: Look for the pre/code element that contains the JSON
+                var jsonElements = _driver.FindElements(By.XPath("//h2[text()='Submit data']/following-sibling::*[1]"));
+                if (jsonElements.Count > 0)
+                {
+                    var jsonText = jsonElements[0].Text;
+                    // Verify it's actual JSON data, not empty
+                    if (jsonText.Contains("\"First Name\"") && jsonText.Length > 50)
+                    {
+                        Console.WriteLine("[RESPONSE] Submit response detected via element check");
+                        return true;
+                    }
+                }
+                
+                Console.WriteLine("[RESPONSE] Submit response NOT detected - form likely did not submit");
+                Console.WriteLine($"[RESPONSE] Has heading: {hasSubmitHeading}, Has JSON: {hasJsonResponse}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[RESPONSE] Error checking submit response: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the form has any HTML5 validation errors preventing submission
+        /// </summary>
+        public bool HasFormValidationErrors()
+        {
+            try
+            {
+                var jsExecutor = (IJavaScriptExecutor)_driver;
+                var isValid = (bool)jsExecutor.ExecuteScript(
+                    "var form = document.querySelector('form'); " +
+                    "return form ? form.checkValidity() : true;");
+                return !isValid;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets validation message from a specific field
+        /// </summary>
+        public string GetFieldValidationMessage(IWebElement element)
+        {
+            try
+            {
+                return element.GetAttribute("validationMessage") ?? string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        #endregion
+
         #region First Name Field
 
         /// <summary>

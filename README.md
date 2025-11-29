@@ -1,54 +1,115 @@
-**CloudQA Automation Practice — README**
+# CloudQA Automation
 
-- **Project**: CloudQAAutomation — C# + Selenium tests for the AutomationPracticeForm page.
+Short summary
+----------------
+CloudQA Automation is a compact .NET-based test suite that verifies a practice form's behavior. Tests exercise three core fields (First Name, Email, State) and cover interactions in the main page, inside iframes (with and without ids), and within Shadow DOM. The suite captures screenshots and HTML snapshots to help diagnose failures.
 
-**Task**
-- **Description**: Implement automated tests (C# + Selenium) for any three fields on `app.cloudqa.io/home/AutomationPracticeForm` so tests keep working even if element positions or HTML attributes change.
+Who this README is for
+- Developers and QA engineers running tests locally on Windows
+- CI engineers who need reproducible test commands
 
-**What This Repo Contains**
-- **Three automated fields**: First Name (text input), Email (text input with validation), State (dropdown select).
-- **Primary test class**: `Tests/ThreeFieldTests.cs` — contains unit tests exercising the three fields and integration/resilience checks.
-- **Page object**: `PageObjects/AutomationPracticeFormPage.cs` — encapsulates interactions with the form.
-- **Helpers**: `Helpers/RobustElementFinder.cs` — multi-strategy element lookup used to make tests resilient to DOM changes.
-- **Run script**: `RunTests.ps1` — convenience PowerShell script to run the test suite.
+Why this repo exists (one line)
+- To provide resilient automation that validates form behavior across common web contexts and surface validation bugs quickly.
 
-**Design & Resilience Approach**
-- **Multi-strategy locators**: The project uses `RobustElementFinder` to locate elements using multiple strategies (label association, relative XPath, ARIA attributes, visible text) rather than relying on brittle IDs or fixed positions.
-- **Page Object Pattern**: `AutomationPracticeFormPage` centralizes selectors and actions, so locator changes are isolated in one place.
-- **Explicit waits / JS interactions**: Tests use waits and, where appropriate, JavaScript execution to interact reliably with the UI.
-- **Tests assert behavior, not markup**: Assertions verify field values and behaviors (persistence after scroll/refresh, dropdown options), which is more robust against HTML reshuffles.
+Quick Start — top commands
+--------------------------
+Start here: three important commands you'll use most often.
 
-**Prerequisites**
-- **.NET SDK**: Install .NET 8 SDK (project targets `net8.0`).
-- **Browser**: Chrome/Chromium or Edge installed. Selenium Manager is used to obtain the appropriate driver automatically.
-- **PowerShell**: Tests can be run from PowerShell (Windows). If `RunTests.ps1` is blocked, you may need to set execution policy or run PowerShell as Administrator.
+- Testing for submission (run submission validations):
 
-**Run The Tests**
-Open PowerShell in the repository root and run one of the commands below.
-
-PowerShell (recommended):
-```
+```powershell
+# Run the helper script (restores, builds Release, runs tests)
 .\RunTests.ps1
+
+# Or run only the form submission test category directly
+dotnet test --configuration Release --filter "Category=FormSubmission"
 ```
 
-or using dotnet test (build + run):
+Validation tests included in `FormSubmissionTests` (what we check during submission)
+- Test_100: Submit complete valid form (all fields filled)
+- Test_101: Submit with minimum required fields
+- Test_102: Prevent submission without Terms & Conditions checked
+- Test_103: Reject incorrect date format (DD/MM/YYYY)
+- Test_104: Reject invalid email formats
+- Test_105: Reject mismatched Password / Confirm Password
+- Test_106: Prevent submission when required fields (Email) are empty
+- Test_107: Preserve and accept special characters in fields
+- Test_108: Enforce maximum length limits for text fields
+- Test_109: Submit with multiple hobbies selected
+- Test_110: Submit with each gender option (Male/Female/Transgender)
+- Test_111: Reject future Date of Birth values
+- Test_112: Accept default state value when State is optional
+
+- Three level testing for all levels (Main, IFrame, Shadow DOM):
+
+```powershell
+# Run Level_Main, Level_IFrame_NoId, Level_IFrame_WithId, Level_ShadowDom
+dotnet test --configuration Release --filter "Category=Level_Main|Category=Level_IFrame_NoId|Category=Level_IFrame_WithId|Category=Level_ShadowDom"
 ```
+
+- Three level testing for a specific level:
+
+```powershell
+# Replace LEVEL with one of: Level_Main, Level_IFrame_NoId, Level_IFrame_WithId, Level_ShadowDom
+dotnet test --configuration Release --filter "Category=LEVEL"
+
+# Example: run only main-document three-field tests
+dotnet test --configuration Release --filter "Category=Level_Main"
+```
+
+Prerequisites
+-------------
+- .NET 8 SDK installed (run `dotnet --version` to verify).
+- A modern browser (Chrome or Edge) and matching WebDriver.
+- PowerShell on Windows (examples below use PowerShell syntax).
+
+If you prefer automatic driver management, the repo includes Selenium Manager binaries under `bin/**/selenium-manager/windows/`.
+
+Basic commands (friendly)
+-------------------------
+- Restore packages:
+
+```powershell
+dotnet restore
+```
+
+- Build (release):
+
+```powershell
+dotnet build --configuration Release
+```
+
+- Run whole test suite:
+
+```powershell
 dotnet test --configuration Release
 ```
 
-Run a specific test category (example: FirstName) — using `dotnet test` with a filter:
+- Run tests with detailed console output:
+
+```powershell
+dotnet test --configuration Release --logger "console;verbosity=detailed"
 ```
-dotnet test --configuration Release --filter "Category=FirstName"
+
+- Run a single test by fully-qualified name (copy name from the test file):
+
+```powershell
+dotnet test --filter "FullyQualifiedName=CloudQAAutomation.Tests.ThreeFieldTests.Test_11_Integration_FillAllThreeFieldsTogether"
 ```
 
-**Key Files**
-- `PageObjects/AutomationPracticeFormPage.cs` — page object for form interactions.
-- `Tests/ThreeFieldTests.cs` — NUnit tests for the three fields and resilience checks.
-- `Helpers/RobustElementFinder.cs` — logic for resilient element lookup.
-- `RunTests.ps1` — test runner script (PowerShell).
+Logs and artifacts
+------------------
+- HTML snapshots: `logs/html-snippets/`
+- Screenshots saved during teardown: `logs/screenshots/`
 
+Troubleshooting
+---------------
+- PowerShell blocked the script? Run:
 
-**Notes**
-- The suite includes tests that verify resiliency (refresh, scroll, repeated selection) to demonstrate the multi-strategy locator approach.
-- If you run into driver issues, ensure the browser is up-to-date; Selenium Manager (used by the WebDriver) will typically install the correct driver.
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+```
+
+- `dotnet` not found: install .NET 8 SDK at https://dotnet.microsoft.com/download
+- Browser/driver mismatch: update WebDriver or use the included Selenium Manager binary
 
