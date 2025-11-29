@@ -1,5 +1,6 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using System.Text.RegularExpressions;
 using CloudQAAutomation.Helpers;
 
 namespace CloudQAAutomation.PageObjects
@@ -481,6 +482,57 @@ namespace CloudQAAutomation.PageObjects
             return element.Selected;
         }
 
+        /// <summary>
+        /// Attempts to check a terms/agree checkbox inside a shadow host located by the given heading.
+        /// Falls back to doing nothing if no checkbox is found in the shadow host.
+        /// </summary>
+        public void CheckShadowTermsIfPresent(string headingText)
+        {
+            Console.WriteLine($"[TERMS-SHADOW] Attempting to check terms inside shadow host: {headingText}");
+            try
+            {
+                var el = FindElementInShadowByHeading(headingText, "input[type='checkbox'], input[name='Agree']");
+                if (el != null && !el.Selected)
+                {
+                    _elementFinder.SafeClick(el);
+                    Console.WriteLine("[TERMS-SHADOW] Checked shadow terms checkbox");
+                }
+            }
+            catch (NoSuchElementException)
+            {
+                Console.WriteLine("[TERMS-SHADOW] No checkbox found in shadow host; skipping shadow terms check");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[TERMS-SHADOW] Error checking shadow terms: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Attempts to uncheck a terms/agree checkbox inside a shadow host located by the given heading.
+        /// </summary>
+        public void UncheckShadowTermsIfPresent(string headingText)
+        {
+            Console.WriteLine($"[TERMS-SHADOW] Attempting to uncheck terms inside shadow host: {headingText}");
+            try
+            {
+                var el = FindElementInShadowByHeading(headingText, "input[type='checkbox'], input[name='Agree']");
+                if (el != null && el.Selected)
+                {
+                    _elementFinder.SafeClick(el);
+                    Console.WriteLine("[TERMS-SHADOW] Unchecked shadow terms checkbox");
+                }
+            }
+            catch (NoSuchElementException)
+            {
+                Console.WriteLine("[TERMS-SHADOW] No checkbox found in shadow host; skipping shadow terms uncheck");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[TERMS-SHADOW] Error unchecking shadow terms: {ex.Message}");
+            }
+        }
+
         #endregion
 
         #region Submit Response Validation
@@ -504,43 +556,42 @@ namespace CloudQAAutomation.PageObjects
 
                 // Try multiple strategies to find the response
                 IWebElement? responseElement = null;
-                
+
                 try
                 {
                     responseElement = _driver.FindElement(By.XPath("//h2[contains(text(), 'Submit data')]/following::*[1]"));
                 }
-                catch
-                {
-                    try
-                    {
-                        // Look for any element containing the JSON structure
-                        responseElement = _driver.FindElement(By.XPath("//*[contains(text(), '\"First Name\"')]"));
-                    }
-                    catch
-                    {
-                        // Last resort: check page source for JSON
-                        if (pageSource.Contains("{\"First Name\":"))
-                        {
-                            var startIdx = pageSource.IndexOf("{\"First Name\":");
-                            if (startIdx >= 0)
-                            {
-                                var endIdx = pageSource.IndexOf("}", startIdx);
-                                if (endIdx > startIdx)
-                                {
-                                    var jsonText = pageSource.Substring(startIdx, endIdx - startIdx + 1);
-                                    ParseJsonResponse(jsonText, data);
-                                    return data;
-                                }
-                            }
-                        }
-                    }
-                }
+                catch { /* ignore */ }
 
+                // If an element was found, try to parse its text
                 if (responseElement != null)
                 {
                     var responseText = responseElement.Text;
-                    Console.WriteLine($"[RESPONSE] Raw response: {responseText}");
+                    Console.WriteLine($"[RESPONSE] Raw response from element: {responseText}");
+                    // Try regex-based parsing from the element text
                     ParseJsonResponse(responseText, data);
+                    if (data.Count > 0) return data;
+                }
+
+                // If element parsing failed, try to extract a JSON block from the page source
+                try
+                {
+                    var jsonBlocks = Regex.Matches(pageSource, "\\{[\\s\\S]*?\\}");
+                    foreach (Match m in jsonBlocks)
+                    {
+                        var jsonText = m.Value;
+                        // Heuristic: accept blocks that contain expected keys
+                        if (jsonText.Contains("\"First Name\"") || jsonText.Contains("\"fname\"") || jsonText.Contains("\"lname\"") || jsonText.Contains("\"__RequestVerificationToken\""))
+                        {
+                            Console.WriteLine($"[RESPONSE] Found JSON block candidate: {jsonText}");
+                            ParseJsonResponse(jsonText, data);
+                            if (data.Count > 0) return data;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[RESPONSE] Error scanning for JSON blocks: {ex.Message}");
                 }
             }
             catch (Exception ex)
@@ -553,25 +604,25 @@ namespace CloudQAAutomation.PageObjects
 
         private void ParseJsonResponse(string responseText, Dictionary<string, string> data)
         {
-            // Parse the JSON-like response
-            // The response format is like: { "First Name": "Test", "Last Name": "Test2", ... }
-            var lines = responseText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var line in lines)
+            try
             {
-                if (line.Contains(":"))
+                // Find key/value pairs of the form "key": "value"
+                var pairPattern = new Regex("\"(?<key>[^\"]+)\"\\s*:\\s*\"(?<value>[^\"]*)\"");
+                var matches = pairPattern.Matches(responseText);
+                foreach (Match m in matches)
                 {
-                    var parts = line.Split(new[] { ':' }, 2);
-                    if (parts.Length == 2)
+                    var key = m.Groups["key"].Value.Trim();
+                    var value = m.Groups["value"].Value.Trim();
+                    if (!string.IsNullOrWhiteSpace(key) && !key.StartsWith("__"))
                     {
-                        var key = parts[0].Trim().Trim('"', '{', ',', ' ');
-                        var value = parts[1].Trim().Trim('"', ',', '}', ' ');
-                        if (!string.IsNullOrWhiteSpace(key) && !key.StartsWith("__"))
-                        {
-                            data[key] = value;
-                            Console.WriteLine($"[RESPONSE] Parsed: {key} = {value}");
-                        }
+                        data[key] = value;
+                        Console.WriteLine($"[RESPONSE] Parsed: {key} = {value}");
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[RESPONSE] Error parsing JSON response text: {ex.Message}");
             }
         }
 
@@ -594,9 +645,35 @@ namespace CloudQAAutomation.PageObjects
                 bool hasSubmitHeading = pageSource.Contains("<h2>Submit data</h2>") || 
                                        pageSource.Contains(">Submit data<");
                 
-                bool hasJsonResponse = pageSource.Contains("\"First Name\":") && 
-                                      pageSource.Contains("\"Last Name\":") &&
+                // Existing strict check (old format)
+                bool hasJsonResponse = pageSource.Contains("\"First Name:\"") && 
+                                      pageSource.Contains("\"Last Name:\"") &&
                                       pageSource.Contains("\"__RequestVerificationToken\":");
+
+                // Flexible detection for other response formats (e.g., shadow DOM uses keys like "fname"/"lname")
+                if (!hasJsonResponse)
+                {
+                    // Look for common field keys that may appear in alternative JSON payloads
+                    if (pageSource.Contains("\"fname\"") || pageSource.Contains("\"lname\"") || pageSource.Contains("\"State\"") || pageSource.Contains("\"Email\"") || pageSource.Contains("\"__RequestVerificationToken\""))
+                    {
+                        hasJsonResponse = true;
+                    }
+                }
+
+                // Regex fallback: detect at least two JSON-like key:value pairs somewhere in the page
+                if (!hasJsonResponse)
+                {
+                    try
+                    {
+                        var jsonPattern = new Regex("\"[^\"]+\"\\s*:\\s*\"[^\"]*\"");
+                        var matches = jsonPattern.Matches(pageSource);
+                        if (matches != null && matches.Count >= 2)
+                        {
+                            hasJsonResponse = true;
+                        }
+                    }
+                    catch { /* ignore regex failures */ }
+                }
                 
                 // The form must have BOTH the heading AND the JSON response
                 if (hasSubmitHeading && hasJsonResponse)

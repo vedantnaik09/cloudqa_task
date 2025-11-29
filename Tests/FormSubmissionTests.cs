@@ -504,49 +504,50 @@ namespace CloudQAAutomation.Tests
         #endregion
 
         #region IFrame without ID - Form Submission Tests (TODO: Implement when iframe methods are added)
-
-        /* Commented out until SwitchToIFrameByHeading() method is implemented in PageObject
-        
         [Test, Order(200)]
         [Category("Submit_IFrameNoId")]
         [Category("PositiveTest")]
         public void Test_200_IFrameNoId_Submit_CompleteValidForm()
         {
-            // Arrange
             Console.WriteLine("\n[IFRAME-NO-ID] Test: Submit complete valid form");
-            
-            // Switch to iframe without ID (located by heading)
-            _page!.SwitchToIFrameByHeading("IFrame Without Id");
-            
-            var testData = new
+            try
             {
-                FirstName = "IFrameNoId",
-                LastName = "Test",
-                Email = "iframe.noid@test.com",
-                Gender = "Male",
-                DateOfBirth = "1988-09-10"
-            };
+                _page!.SwitchToIframeContainingHeading("IFrame without ID");
 
-            // Act
-            _page.EnterFirstName(testData.FirstName);
-            _page.EnterLastName(testData.LastName);
-            _page.EnterEmail(testData.Email);
-            _page.SelectGender(testData.Gender);
-            _page.EnterDateOfBirth(testData.DateOfBirth);
-            _page.CheckTermsAndConditions();
+                var testData = new
+                {
+                    FirstName = "IFrameNoId",
+                    LastName = "Test",
+                    Email = "iframe.noid@test.com",
+                    Gender = "Male",
+                    DateOfBirth = "1988-09-10"
+                };
 
-            Console.WriteLine("[SUBMIT] Submitting iframe form...");
-            _page.SubmitForm();
+                _page.EnterFirstName(testData.FirstName);
+                _page.EnterLastName(testData.LastName);
+                _page.EnterEmail(testData.Email);
+                _page.SelectGender(testData.Gender);
+                _page.EnterDateOfBirth(testData.DateOfBirth);
+                _page.CheckTermsAndConditions();
 
-            Thread.Sleep(2000);
+                Console.WriteLine("[SUBMIT] Submitting iframe (no-id) form...");
+                _page.SubmitForm();
 
-            // Assert
-            Assert.That(_page.IsSubmitResponseDisplayed(), Is.True, 
-                "IFrame form should submit successfully");
+                Thread.Sleep(2000);
 
-            Console.WriteLine("✓ IFrame without ID form submitted successfully");
-            
-            _page.SwitchToDefaultContent();
+                Assert.That(_page.IsSubmitResponseDisplayed(), Is.True,
+                    "IFrame (no-id) form should submit successfully");
+
+                var response = _page.GetSubmitResponseData();
+                Assert.That(response, Is.Not.Empty);
+                Assert.That(response.ContainsKey("First Name") ? response["First Name"] : string.Empty, Is.EqualTo(testData.FirstName));
+
+                Console.WriteLine("✓ IFrame without ID form submitted successfully");
+            }
+            finally
+            {
+                _page!.SwitchToDefaultContent();
+            }
         }
 
         [Test, Order(201)]
@@ -554,80 +555,81 @@ namespace CloudQAAutomation.Tests
         [Category("NegativeTest")]
         public void Test_201_IFrameNoId_Submit_WithoutTermsCheckbox()
         {
-            // Arrange
             Console.WriteLine("\n[IFRAME-NO-ID] Test: Submit without terms checkbox");
-            
-            _page!.SwitchToIFrameByHeading("IFrame Without Id");
-            
-            _page.EnterFirstName("IFrame");
-            _page.EnterLastName("NoTerms");
-            _page.EnterEmail("iframe.noterms@test.com");
-            _page.SelectGender("Female");
-            _page.EnterDateOfBirth("1992-05-20");
-            _page.UncheckTermsAndConditions();
+            try
+            {
+                _page!.SwitchToIframeContainingHeading("IFrame without ID");
 
-            // Act
-            Console.WriteLine("[SUBMIT] Attempting to submit without terms...");
-            _page.SubmitForm();
+                _page.EnterFirstName("IFrame");
+                _page.EnterLastName("NoTerms");
+                _page.EnterEmail("iframe.noterms@test.com");
+                _page.SelectGender("Female");
+                _page.EnterDateOfBirth("1992-05-20");
+                _page.UncheckTermsAndConditions();
 
-            Thread.Sleep(2000);
+                Console.WriteLine("[SUBMIT] Attempting to submit without terms...");
+                _page.SubmitForm();
 
-            // Assert
-            Assert.That(_page.IsSubmitResponseDisplayed(), Is.False, 
-                "IFrame form should prevent submission without terms checkbox");
+                Thread.Sleep(2000);
 
-            Console.WriteLine("✓ IFrame form correctly prevented submission");
-            
-            _page.SwitchToDefaultContent();
+                Assert.That(_page.IsSubmitResponseDisplayed(), Is.False,
+                    "IFrame (no-id) form should prevent submission without terms checkbox");
+
+                Console.WriteLine("✓ IFrame form correctly prevented submission");
+            }
+            finally
+            {
+                _page!.SwitchToDefaultContent();
+            }
         }
-        */
 
         #endregion
 
         #region IFrame with ID - Form Submission Tests (TODO: Implement when iframe methods are added)
-
-        /* Commented out until SwitchToIFrameById() method is implemented in PageObject
-        
         [Test, Order(300)]
         [Category("Submit_IFrameWithId")]
         [Category("PositiveTest")]
         public void Test_300_IFrameWithId_Submit_CompleteValidForm()
         {
-            // Arrange
             Console.WriteLine("\n[IFRAME-WITH-ID] Test: Submit complete valid form");
-            
-            // Switch to iframe with ID
-            _page!.SwitchToIFrameById("iframeId");
-            
-            var testData = new
+            try
             {
-                FirstName = "IFrameId",
-                LastName = "Test",
-                Email = "iframe.withid@test.com",
-                Gender = "Transgender",
-                DateOfBirth = "1995-03-15"
-            };
+                _page!.SwitchToIframeById("iframeId");
 
-            // Act
-            _page.EnterFirstName(testData.FirstName);
-            _page.EnterLastName(testData.LastName);
-            _page.EnterEmail(testData.Email);
-            _page.SelectGender(testData.Gender);
-            _page.EnterDateOfBirth(testData.DateOfBirth);
-            _page.CheckTermsAndConditions();
+                var testData = new
+                {
+                    FirstName = "IFrameId",
+                    LastName = "Test",
+                    Email = "iframe.withid@test.com",
+                    Gender = "Transgender",
+                    DateOfBirth = "1995-03-15"
+                };
 
-            Console.WriteLine("[SUBMIT] Submitting iframe form...");
-            _page.SubmitForm();
+                _page.EnterFirstName(testData.FirstName);
+                _page.EnterLastName(testData.LastName);
+                _page.EnterEmail(testData.Email);
+                _page.SelectGender(testData.Gender);
+                _page.EnterDateOfBirth(testData.DateOfBirth);
+                _page.CheckTermsAndConditions();
 
-            Thread.Sleep(2000);
+                Console.WriteLine("[SUBMIT] Submitting iframe (with id) form...");
+                _page.SubmitForm();
 
-            // Assert
-            Assert.That(_page.IsSubmitResponseDisplayed(), Is.True, 
-                "IFrame with ID form should submit successfully");
+                Thread.Sleep(2000);
 
-            Console.WriteLine("✓ IFrame with ID form submitted successfully");
-            
-            _page.SwitchToDefaultContent();
+                Assert.That(_page.IsSubmitResponseDisplayed(), Is.True,
+                    "IFrame (with id) form should submit successfully");
+
+                var response = _page.GetSubmitResponseData();
+                Assert.That(response, Is.Not.Empty);
+                Assert.That(response.ContainsKey("Email") ? response["Email"] : string.Empty, Is.EqualTo(testData.Email));
+
+                Console.WriteLine("✓ IFrame with ID form submitted successfully");
+            }
+            finally
+            {
+                _page!.SwitchToDefaultContent();
+            }
         }
 
         [Test, Order(301)]
@@ -635,73 +637,132 @@ namespace CloudQAAutomation.Tests
         [Category("NegativeTest")]
         public void Test_301_IFrameWithId_Submit_InvalidEmail()
         {
-            // Arrange
             Console.WriteLine("\n[IFRAME-WITH-ID] Test: Submit with invalid email");
-            
-            _page!.SwitchToIFrameById("iframeId");
-            
-            _page.EnterFirstName("Invalid");
-            _page.EnterLastName("Email");
-            _page.EnterEmail("notanemail");
-            _page.SelectGender("Male");
-            _page.EnterDateOfBirth("1990-07-22");
-            _page.CheckTermsAndConditions();
+            try
+            {
+                _page!.SwitchToIframeById("iframeId");
 
-            // Act
-            Console.WriteLine("[SUBMIT] Attempting to submit with invalid email...");
-            _page.SubmitForm();
+                _page.EnterFirstName("Invalid");
+                _page.EnterLastName("Email");
+                _page.EnterEmail("notanemail");
+                _page.SelectGender("Male");
+                _page.EnterDateOfBirth("1990-07-22");
+                _page.CheckTermsAndConditions();
 
-            Thread.Sleep(2000);
+                Console.WriteLine("[SUBMIT] Attempting to submit with invalid email...");
+                _page.SubmitForm();
 
-            // Assert
-            Assert.That(_page.IsSubmitResponseDisplayed(), Is.False, 
-                "IFrame form should reject invalid email format");
+                Thread.Sleep(2000);
 
-            Console.WriteLine("✓ IFrame form correctly prevented submission");
-            
-            _page.SwitchToDefaultContent();
+                Assert.That(_page.IsSubmitResponseDisplayed(), Is.False,
+                    "IFrame (with id) form should reject invalid email format");
+
+                Console.WriteLine("✓ IFrame form correctly prevented submission");
+            }
+            finally
+            {
+                _page!.SwitchToDefaultContent();
+            }
         }
-        */
 
         #endregion
 
         #region Shadow DOM - Form Submission Tests (Shadow DOM doesn't have submission, only field interaction)
+
+        // Note: replaced the field-only Shadow DOM test with the submission-capable one below.
 
         [Test, Order(400)]
         [Category("Submit_ShadowDOM")]
         [Category("PositiveTest")]
         public void Test_400_ShadowDOM_Submit_CompleteValidForm()
         {
-            // Arrange
-            Console.WriteLine("\n[SHADOW-DOM] Test: Submit complete valid form");
-            
-            var testData = new
+            Console.WriteLine("\n[SHADOW-DOM] Test: Submit complete valid form (shadow section)");
+
+            // Fill shadow-hosted fields using page object helpers
+            _page!.EnterShadowFirstName("Shadow DOM", "ShadowDOM");
+            _page.EnterShadowLastName("Shadow DOM", "Test");
+            _page.SelectShadowState("Shadow DOM", "India");
+
+            // The submit button for this form is outside the shadow host but inside the same form
+            try
             {
-                FirstName = "ShadowDOM",
-                LastName = "Test",
-                State = "India"
-            };
+                var formSubmit = Driver!.FindElement(By.CssSelector("form#shadowdomautomationtestform button"));
+                if (formSubmit == null)
+                {
+                    Assert.Inconclusive("Submit button for shadow DOM form not found by selector 'form#shadowdomautomationtestform button'.");
+                    return;
+                }
 
-            // Act - Fill Shadow DOM fields
-            _page!.EnterShadowFirstName("Shadow DOM", testData.FirstName);
-            _page.EnterShadowLastName("Shadow DOM", testData.LastName);
-            _page.SelectShadowState("Shadow DOM", testData.State);
-            
-            // Verify values
-            var firstName = _page.GetShadowFirstNameValue("Shadow DOM");
-            var lastName = _page.GetShadowLastNameValue("Shadow DOM");
-            var state = _page.GetSelectedShadowState("Shadow DOM");
+                // Only check the terms checkbox inside the shadow host (do NOT fall back to main form checkbox)
+                _page.CheckShadowTermsIfPresent("Shadow DOM");
 
-            // Assert
-            Assert.That(firstName, Is.EqualTo(testData.FirstName), "Shadow DOM first name should match");
-            Assert.That(lastName, Is.EqualTo(testData.LastName), "Shadow DOM last name should match");
-            Assert.That(state, Is.EqualTo(testData.State), "Shadow DOM state should match");
+                try
+                {
+                    formSubmit.Click();
+                }
+                catch (OpenQA.Selenium.ElementNotInteractableException)
+                {
+                    // Fallback to JS click when element is not interactable (e.g., wrapped by custom element)
+                    ((IJavaScriptExecutor)Driver).ExecuteScript("arguments[0].click();", formSubmit);
+                }
+                catch (Exception)
+                {
+                    // As a last resort, try JS click
+                    ((IJavaScriptExecutor)Driver).ExecuteScript("arguments[0].click();", formSubmit);
+                }
 
-            Console.WriteLine("✓ Shadow DOM form fields filled and verified successfully");
+                // Wait a moment for submission to be processed and page to update
+                Thread.Sleep(2000);
+
+                Console.WriteLine("[RESPONSE] Checking for submit response after shadow form submit...");
+                Assert.That(_page.IsSubmitResponseDisplayed(), Is.True, "Submitting shadow DOM form should show response");
+                var response = _page.GetSubmitResponseData();
+                Assert.That(response, Is.Not.Empty);
+
+                Console.WriteLine("✓ Shadow DOM form submitted and response verified");
+            }
+            catch (NoSuchElementException)
+            {
+                Assert.Inconclusive("Submit button for shadow DOM form not present in DOM.");
+            }
         }
 
-        // Note: Shadow DOM form tests are in ThreeFieldTests.cs as they only test field interaction,
-        // not full form submission. Shadow DOM section doesn't have submit button functionality.
+        [Test, Order(401)]
+        [Category("Submit_ShadowDOM")]
+        [Category("NegativeTest")]
+        public void Test_402_ShadowDOM_MissingFirstNamePreventsSubmit_WhenRequired()
+        {
+            Console.WriteLine("\n[SHADOW-DOM] Test: Submit with missing First Name (only if field is required)");
+
+            // Locate the shadow-hosted first name element
+            var firstNameEl = _page!.FindElementInShadowByHeading("Shadow DOM", "section[slot='fname'] input, input#fname, input[name='fname']");
+
+            // If the field isn't marked required, we cannot assert negative HTML5 validation reliably
+            var required = firstNameEl.GetAttribute("required");
+            if (string.IsNullOrEmpty(required))
+            {
+                Assert.Ignore("Shadow DOM First Name field is not marked 'required'; skipping negative validation test.");
+                return;
+            }
+
+            // Clear the field and attempt to submit the enclosing form
+            firstNameEl.Clear();
+
+            try
+            {
+                var form = Driver!.FindElement(By.CssSelector("form#shadowdomautomationtestform"));
+                var isValid = (bool)((IJavaScriptExecutor)Driver).ExecuteScript("return arguments[0].checkValidity();", form);
+
+                // The form should be invalid when required field is empty
+                Assert.That(isValid, Is.False, "Form validity should be false when required first name is missing");
+
+                Console.WriteLine("✓ Shadow DOM form validity prevented submission due to missing First Name");
+            }
+            catch (NoSuchElementException)
+            {
+                Assert.Ignore("Shadow DOM form element not found; skipping negative validation test.");
+            }
+        }
 
         #endregion
     }

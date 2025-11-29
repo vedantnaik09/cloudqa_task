@@ -21,8 +21,8 @@ Start here: three important commands you'll use most often.
 # Run the helper script (restores, builds Release, runs tests)
 .\RunTests.ps1
 
-# Or run only the form submission test category directly
-dotnet test --configuration Release --filter "Category=FormSubmission"
+# Or run only the form submission test category and get a pass/fail summary
+.\scripts\RunAndSummarizeTests.ps1 -Project .\CloudQAAutomation.csproj -Filter "Category=FormSubmission"
 ```
 
 Validation tests included in `FormSubmissionTests` (what we check during submission)
@@ -39,22 +39,37 @@ Validation tests included in `FormSubmissionTests` (what we check during submiss
 - Test_110: Submit with each gender option (Male/Female/Transgender)
 - Test_111: Reject future Date of Birth values
 - Test_112: Accept default state value when State is optional
+ - Test_23: IFrame (no-id) - Invalid email validation inside iframe (field-level)
+ - Test_24: IFrame (no-id) - Missing first-name prevents submit (validation)
+ - Test_25: IFrame (with id) - Invalid email validation inside iframe (field-level)
+ - Test_26: IFrame (with id) - Unchecked terms prevents submit (validation)
+ - Test_27: Shadow DOM - First Name required validation (field-level)
+ - Test_28: Shadow DOM - State default option behavior (field-level)
+ - Test_200: IFrameNoId_Submit_CompleteValidForm - Submit a complete, valid form inside the iframe located by heading.
+ - Test_201: IFrameNoId_Submit_WithoutTermsCheckbox - Negative: ensure iframe form blocks submit when Terms not checked.
+ - Test_300: IFrameWithId_Submit_CompleteValidForm - Submit a complete, valid form inside the iframe identified by `iframeId`.
+ - Test_301: IFrameWithId_Submit_InvalidEmail - Negative: iframe form should reject invalid email (server/client validation).
+ - Test_400: ShadowDOM_Submit_CompleteValidForm - Submit the shadow-hosted section and verify response JSON.
+ - Test_402: ShadowDOM_MissingFirstNamePreventsSubmit_WhenRequired - Negative: checks missing required first-name in shadow host (skips if not marked `required`).
+
+Category notes:
+- The new submission tests use categories `Submit_IFrameNoId`, `Submit_IFrameWithId`, and `Submit_ShadowDOM` so they can be targeted by the run filters or helper scripts.
 
 - Three level testing for all levels (Main, IFrame, Shadow DOM):
 
 ```powershell
-# Run Level_Main, Level_IFrame_NoId, Level_IFrame_WithId, Level_ShadowDom
-dotnet test --configuration Release --filter "Category=Level_Main|Category=Level_IFrame_NoId|Category=Level_IFrame_WithId|Category=Level_ShadowDom"
+# Run Level_Main, Level_IFrame_NoId, Level_IFrame_WithId, Level_ShadowDom and get a summarized report
+.\scripts\RunAndSummarizeTests.ps1 -Project .\CloudQAAutomation.csproj -Filter "Category=Level_Main|Category=Level_IFrame_NoId|Category=Level_IFrame_WithId|Category=Level_ShadowDom"
 ```
 
 - Three level testing for a specific level:
 
 ```powershell
 # Replace LEVEL with one of: Level_Main, Level_IFrame_NoId, Level_IFrame_WithId, Level_ShadowDom
-dotnet test --configuration Release --filter "Category=LEVEL"
+.\scripts\RunAndSummarizeTests.ps1 -Project .\CloudQAAutomation.csproj -Filter "Category=LEVEL"
 
 # Example: run only main-document three-field tests
-dotnet test --configuration Release --filter "Category=Level_Main"
+.\scripts\RunAndSummarizeTests.ps1 -Project .\CloudQAAutomation.csproj -Filter "Category=Level_Main"
 ```
 
 Prerequisites
@@ -79,10 +94,11 @@ dotnet restore
 dotnet build --configuration Release
 ```
 
-- Run whole test suite:
+ - Run whole test suite:
 
 ```powershell
-dotnet test --configuration Release
+# Run the entire test suite and generate a summarized TRX-based report
+.\scripts\RunAndSummarizeTests.ps1 -Project .\CloudQAAutomation.csproj
 ```
 
 - Run tests with detailed console output:
@@ -94,7 +110,7 @@ dotnet test --configuration Release --logger "console;verbosity=detailed"
 - Run a single test by fully-qualified name (copy name from the test file):
 
 ```powershell
-dotnet test --filter "FullyQualifiedName=CloudQAAutomation.Tests.ThreeFieldTests.Test_11_Integration_FillAllThreeFieldsTogether"
+.\scripts\RunAndSummarizeTests.ps1 -Project .\CloudQAAutomation.csproj -Filter "FullyQualifiedName=CloudQAAutomation.Tests.ThreeFieldTests.Test_11_Integration_FillAllThreeFieldsTogether"
 ```
 
 Logs and artifacts
