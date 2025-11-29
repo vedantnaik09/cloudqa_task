@@ -21,10 +21,11 @@ Start here: three important commands you'll use most often.
 - Testing for submission (run submission validations):
 
 ```powershell
-# Run the helper script (restores, builds Release, runs tests)
-.\RunTests.ps1
+# Prepare the project (restore + build), then run tests with summary
+# Run the setup script (restores packages and builds the specified configuration)
+.\scripts\SetupAndBuild.ps1 -Configuration Release
 
-# Or run only the form submission test category and get a pass/fail summary
+# Then run the tests and produce a pass/fail/trx summary
 .\scripts\RunAndSummarizeTests.ps1 -Project .\CloudQAAutomation.csproj -Filter "Category=FormSubmission"
 ```
 
@@ -100,7 +101,10 @@ dotnet build --configuration Release
  - Run whole test suite:
 
 ```powershell
-# Run the entire test suite and generate a summarized TRX-based report
+# Use setup script to restore & build first (optional)
+.\scripts\SetupAndBuild.ps1 -Configuration Release
+
+# Then run the entire test suite and generate a summarized TRX-based report
 .\scripts\RunAndSummarizeTests.ps1 -Project .\CloudQAAutomation.csproj
 ```
 
